@@ -1,0 +1,19 @@
+# EditorConfig file for brace
+
+root = true
+
+[*]
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{txt,md}]
+indent_style = space
+indent_size = 4
+
+[*.{c,cxx,cpp,h,hxx,hpp,py}]
+indent_style = space
+indent_size = 4
+
+[{MakeFile,*.mk}]
+indent_style = tab
+trim_trailing_whitespace = false

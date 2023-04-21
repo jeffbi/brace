@@ -1,0 +1,111 @@
+
+#
+# Operating-system turds
+#
+._*
+.DS_Store
+Thumbs.db
+desktop.ini
+
+#
+# Intermediate files
+#
+*.obj
+*.o
+*.d
+
+#
+# Log files
+#
+*.log
+
+#
+# Local files
+#
+# any directory starting with _
+_*/
+
+#
+# Build results
+#
+[Dd]ebug/
+[Rr]elease/
+o/
+d/
+build/
+_build*/
+[Bb]in/
+[Oo]bj/
+.class
+
+#
+# Pre-compiled headers
+#
+*.pch
+*.gch
+
+
+#
+# Executables
+#
+*.out
+*.exe
+*.app
+
+#
+# Shared library files
+#
+*.so
+*.dylib
+*.dll
+*.cpl
+
+#
+# Static library files
+#
+.a
+.lib
+
+
+#
+# Swap-file and backup files
+#
+*.swp
+*.bak
+*~
+\#*\#
+\.\#*
+
+#
+# Test output files
+# (some .bin files will be deliberately added)
+#
+*.bin
+
+#
+# Visual Studio
+#
+*.aps
+*.bsc
+*.clw
+*.exp
+*.idb
+*.ilk
+*.map
+*.mdp
+*.ncb
+*.pdb
+*.res
+*.sbr
+*.sdf
+*.opensdf
+*.suo
+*.tlb
+*.user
+*.vcp
+ipch/
+
+#
+# Visual Studio Code
+#
+.vscode/

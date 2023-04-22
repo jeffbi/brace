@@ -713,7 +713,7 @@ protected:
 
                     if (quad_pos == 4)
                     {
-                        auto    bytes{decode_quad(quads[0], quads[1], quads[2], quads[2], decode_table)};
+                        auto    bytes{decode_quad(quads[0], quads[1], quads[2], quads[3], decode_table)};
                         auto    bw{outstream.write(bytes.data(), bytes.size())};
 
                         bytes_written += bw;

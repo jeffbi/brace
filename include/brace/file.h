@@ -302,12 +302,14 @@ public:
         return std::fflush(_file);
     }
 
+#if !defined(_MSC_VER)
     /// \brief Sets the internal buffer to use for I/O operations performed on the C stream.
     /// \param buffer   A pointer to the buffer for the stream to use.
     void setbuf(char *buffer)
     {
         std::setbuf(_file, buffer);
     }
+#endif
 
     /// \brief  Change the buffering mode of the C stream, optionally setting a new buffer.
     /// \param buffer   A pointer to a buffer for the stream to use or null pointer to change size and mode only.

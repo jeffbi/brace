@@ -29,7 +29,7 @@ namespace brace
 #elif defined(_WIN32)
 #define BRACE_BYTE_ORDER_LITTLE_ENDIAN    1234
 #define BRACE_BYTE_ORDER_BIG_ENDIAN       4321
-#define BRACE_BYTE_ORDER                  BYTE_ORDER_LITTLE_ENDIAN
+#define BRACE_BYTE_ORDER                  BRACE_BYTE_ORDER_LITTLE_ENDIAN
 #else
 #error "Unrecognized compiler!"
 #endif

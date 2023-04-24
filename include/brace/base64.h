@@ -62,7 +62,7 @@ private:
 
     /// \brief  Determine if a string contains only valid Base64-encoded characters
     /// \param str      The string to be checked.
-    /// \param alphabet Pointer to the alphabe to be used.
+    /// \param alphabet Pointer to the alphabet to be compared against.
     /// \return \c true if the string contains only valid characters, \c false otherwise.
     static std::optional<brace::BasicParseError>
     validate_str(const std::string_view str, const char *alphabet)
@@ -882,8 +882,9 @@ public:
 
         return std::get<std::vector<uint8_t>>(rv);
     }
+
     /// \brief  Decode a Base64 encoded string to its original array of bytes.
-    /// \param str              Base65 encoded string data to decode.
+    /// \param str              Base64 encoded string data to decode.
     /// \param outstream        brace::BinOStream to contain the decoded bytes.
     /// \param ignore_newline   if \c true the decoder ignores newlines
     ///                         encountered in the encoded data.
@@ -903,6 +904,17 @@ public:
         return std::get<size_t>(rv);
     }
 
+    /// \brief  Decode Base64 encoded data from a standard stream into a \c brace::BinOStream.
+    /// \param instream         Standard \c istream containing Base64 encoded data.
+    /// \param outstream        \c brace::BinOStream to receive the decoded bytes.
+    /// \param ignore_newline   if \c true the decoder ignores newlines
+    ///                         encountered in the encoded data.
+    /// \return The number of bytes written to the output stream
+    /// \exception  brace::BasicParserError on failure.
+    /// \details    If there are errors in the input string the function throws.
+    ///             If there are errors when writing to the output stream the function
+    ///             returns prematurely with the number of bytes successfully written.
+    ///             The state of the input and output streams can be checked for errors.
     size_t decode(std::istream &instream, brace::BinOStream &outstream, bool ignore_newline = false)
     {
         auto rv{do_decode(instream, outstream, alphabet(), decode_table(), ignore_newline)};
@@ -994,8 +1006,8 @@ public:
         do_encode(instream, outstream, alphabet());
     }
 
-    /// \brief  Decode a Base64 encoded string to its original array of bytes.
-    /// \param str              Base64 encoded string data to decode.
+    /// \brief  Decode a Base64-URL encoded string to its original array of bytes.
+    /// \param str              Base64-URL encoded string data to decode.
     /// \param ignore_invalid   If \c true the decoder ignores an invalid characters,
     ///                         such as newlines, encountered in the encoded data.
     /// \return On success returns a std::vector of uint8_t objects containing
@@ -1009,6 +1021,49 @@ public:
             throw std::get<brace::BasicParseError>(rv);
 
         return std::get<std::vector<uint8_t>>(rv);
+    }
+
+    /// \brief  Decode a Base64-URL encoded string to its original array of bytes.
+    /// \param str              Base64-URL encoded string data to decode.
+    /// \param outstream        brace::BinOStream to contain the decoded bytes.
+    /// \param ignore_newline   if \c true the decoder ignores newlines
+    ///                         encountered in the encoded data.
+    /// \return The number of bytes written to the output stream
+    /// \exception  brace::BasicParserError on failure.
+    /// \details    If there are errors in the input string the function throws.
+    ///             If there are errors when writing to the output stream the function
+    ///             returns prematurely with the number of bytes successfully written.
+    ///             The state of the output stream can be checked for errors.
+    size_t decode(const std::string_view str, brace::BinOStream &outstream, bool ignore_newline = false)
+    {
+        auto rv{do_decode(str, outstream, alphabet(), decode_table(), ignore_newline)};
+
+        if (std::holds_alternative<brace::BasicParseError>(rv))
+            throw std::get<brace::BasicParseError>(rv);
+
+        return std::get<size_t>(rv);
+    }
+
+
+    /// \brief  Decode Base64-URL encoded data from a standard stream into a \c brace::BinOStream.
+    /// \param instream         Standard \c istream containing Base64-URL encoded data.
+    /// \param outstream        \c brace::BinOStream to receive the decoded bytes.
+    /// \param ignore_newline   if \c true the decoder ignores newlines
+    ///                         encountered in the encoded data.
+    /// \return The number of bytes written to the output stream
+    /// \exception  brace::BasicParserError on failure.
+    /// \details    If there are errors in the input string the function throws.
+    ///             If there are errors when writing to the output stream the function
+    ///             returns prematurely with the number of bytes successfully written.
+    ///             The state of the input and output streams can be checked for errors.
+    size_t decode(std::istream &instream, brace::BinOStream &outstream, bool ignore_newline = false)
+    {
+        auto rv{do_decode(instream, outstream, alphabet(), decode_table(), ignore_newline)};
+
+        if (std::holds_alternative<brace::BasicParseError>(rv))
+            throw std::get<brace::BasicParseError>(rv);
+
+        return std::get<size_t>(rv);
     }
 };
 

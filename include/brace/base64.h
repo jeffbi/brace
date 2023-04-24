@@ -727,8 +727,15 @@ protected:
                 {
                     if (ch == '\n')
                     {
-                        ++line;
-                        pos = 0;
+                        if (ignore_newline)
+                        {
+                            ++line;
+                            pos = 0;
+                        }
+                        else
+                        {
+                            return brace::BasicParseError{line, pos, "Invalid character"};
+                        }
                     }
                     else if (ch == '=')
                     {
@@ -784,6 +791,103 @@ protected:
         }
 
         return bytes_written;
+    }
+
+    std::variant<std::vector<uint8_t>, brace::BasicParseError>
+    do_decode(std::istream &instream, const char *alphabet, const uint8_t *decode_table, bool ignore_newline)
+    {
+        std::array<char, 4>     quads;
+        size_t                  quad_pos{0};
+        char                    pad1{0}, pad2{0};
+        size_t                  line{1};
+        size_t                  pos{1};
+        std::vector<uint8_t>    rv;
+
+        while (instream.good())
+        {
+            char    ch;
+
+            if (instream.get(ch).good())
+            {
+                if (is_valid_character(ch, alphabet))
+                {
+                    if (pad1 || pad2)
+                        return brace::BasicParseError{line, pos - (pad2 ? 2 : 1), "Invalid character"};
+
+                    pad1 = pad2 = 0;
+                    quads[quad_pos++] = ch;
+
+                    if (quad_pos == 4)
+                    {
+                        auto    bytes{decode_quad(quads[0], quads[1], quads[2], quads[3], decode_table)};
+
+                        rv.push_back(bytes[0]);
+                        rv.push_back(bytes[1]);
+                        rv.push_back(bytes[2]);
+
+                        quad_pos = 0;
+                    }
+                }
+                else
+                {
+                    if (ch == '\n')
+                    {
+                        if (ignore_newline)
+                        {
+                            ++line;
+                            pos = 0;
+                        }
+                        else
+                        {
+                            return brace::BasicParseError{line, pos, "Invalid character"};
+                        }
+                    }
+                    else if (ch == '=')
+                    {
+                        if (pad1 == '=')
+                        {
+                            if (pad2 == 0)
+                                pad2 = '=';
+                            else
+                                return brace::BasicParseError{line, pos, "Invalid character"};
+                        }
+                        else
+                        {
+                            pad1 = '=';
+                        }
+                    }
+                    else
+                    {
+                        return brace::BasicParseError{line, pos, "Invalid character"};
+                    }
+                }
+
+                ++pos;
+            }
+        }
+
+        if (quad_pos)   // partial quad remaining
+        {
+            if (quad_pos == 3 && pad1 == '=' && pad2 == 0)
+            {
+                auto    bytes{decode_quad(quads[0], quads[1], quads[2], 'A', decode_table)};
+
+                rv.push_back(bytes[0]);
+                rv.push_back(bytes[1]);
+            }
+            else if (quad_pos == 2 && pad1 == '=' && pad2 == '=')
+            {
+                auto    bytes{decode_quad(quads[0], quads[1], 'A', 'A', decode_table)};
+
+                rv.push_back(bytes[0]);
+            }
+            else
+            {
+                return brace::BasicParseError(line, pos, "Invalid length or padding");
+            }
+        }
+
+        return rv;
     }
 };
 
@@ -872,7 +976,7 @@ public:
     ///                         encountered in the encoded data.
     /// \return On success returns a std::vector of uint8_t objects containing
     /// the decoded bytes.
-    /// \exception brace::BasicParseError on failure.
+    /// \exception \c brace::BasicParseError on failure.
     std::vector<uint8_t> decode(const std::string_view str, bool ignore_newline = false)
     {
         auto rv{do_decode(str, alphabet(), decode_table(), ignore_newline)};
@@ -889,7 +993,7 @@ public:
     /// \param ignore_newline   if \c true the decoder ignores newlines
     ///                         encountered in the encoded data.
     /// \return The number of bytes written to the output stream
-    /// \exception  brace::BasicParserError on failure.
+    /// \exception  \c brace::BasicParseError on failure.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -910,7 +1014,7 @@ public:
     /// \param ignore_newline   if \c true the decoder ignores newlines
     ///                         encountered in the encoded data.
     /// \return The number of bytes written to the output stream
-    /// \exception  brace::BasicParserError on failure.
+    /// \exception  \c brace::BasicParseError on failure.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -923,6 +1027,23 @@ public:
             throw std::get<brace::BasicParseError>(rv);
 
         return std::get<size_t>(rv);
+    }
+
+    /// \brief  Decode Base64 encoded data from a standard stream into vector.
+    /// \param instream         Standard \c istream containing Base64 encoded data.
+    /// \param ignore_newline   if \c true the decoder ignores newlines
+    ///                         encountered in the encoded data.
+    /// \return A \c std::vector<uint8_t> containing the decoded data.
+    /// \exception  \c brace::BasicParseError
+    std::vector<uint8_t>
+    decode(std::istream &instream, bool ignore_newline = false)
+    {
+        auto rv{do_decode(instream, alphabet(), decode_table(), ignore_newline)};
+
+        if (std::holds_alternative<brace::BasicParseError>(rv))
+            throw std::get<brace::BasicParseError>(rv);
+
+        return std::get<std::vector<uint8_t>>(rv);
     }
 };
 
@@ -1064,6 +1185,23 @@ public:
             throw std::get<brace::BasicParseError>(rv);
 
         return std::get<size_t>(rv);
+    }
+
+    /// \brief  Decode Base64-URL encoded data from a standard stream into vector.
+    /// \param instream         Standard \c istream containing Base64-URL encoded data.
+    /// \param ignore_newline   if \c true the decoder ignores newlines
+    ///                         encountered in the encoded data.
+    /// \return A \c std::vector<uint8_t> containing the decoded data.
+    /// \exception  \c brace::BasicParseError
+    std::vector<uint8_t>
+    decode(std::istream &instream, bool ignore_newline = false)
+    {
+        auto rv{do_decode(instream, alphabet(), decode_table(), ignore_newline)};
+
+        if (std::holds_alternative<brace::BasicParseError>(rv))
+            throw std::get<brace::BasicParseError>(rv);
+
+        return std::get<std::vector<uint8_t>>(rv);
     }
 };
 

@@ -60,6 +60,7 @@ TEST_CASE("Test encoding from binary stream to standard stream", "[base64]")
         REQUIRE(chars_written % 4 == 0);
         REQUIRE(encstream.str() == result);
 
+        encstream.clear();
         encstream.seekg(0);
 
         // Prepare an in-memory binary stream to decode into
@@ -73,6 +74,7 @@ TEST_CASE("Test encoding from binary stream to standard stream", "[base64]")
         std::string decoded_word{vec.begin(), vec.end()};
         REQUIRE(decoded_word == word);
 
+        encstream.clear();
         encstream.seekg(0);
 
         std::vector<uint8_t>    dc_vec{brace::Base64().decode(encstream)};

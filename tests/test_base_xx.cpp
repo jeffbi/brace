@@ -37,7 +37,7 @@ TEST_CASE("Simple Base64 round-trip tests", "[base64]")
         REQUIRE(coder.encode(v.begin(), v.end()) == result);
     }
 }
-#if 1
+
 TEST_CASE("Test encoding from binary stream", "[base64]")
 {
     for (const auto &[word, result] : test_data)
@@ -51,21 +51,33 @@ TEST_CASE("Test encoding from binary stream to standard stream", "[base64]")
 {
     for (const auto &[word, result] : test_data)
     {
+        // Create a memory stream containing the word under test.
         brace::BinIArrayStream  instream((uint8_t *)word.data(), (uint8_t *)word.data() + word.size());
         std::stringstream       encstream;
 
+        // Encode from the memory stream to the encoded stream.
         auto chars_written{brace::Base64().encode(instream, encstream)};
         REQUIRE(chars_written % 4 == 0);
         REQUIRE(encstream.str() == result);
 
         encstream.seekg(0);
+
+        // Prepare an in-memory binary stream to decode into
         size_t  sz = word.size();
         std::vector<uint8_t>    vec(sz);
         brace::BinOArrayStream  outstream{vec.data(), vec.data() + vec.size()};
+
+        // Decode from the encoded-data stream to the binary output stream
         sz = brace::Base64().decode(encstream, outstream);
         REQUIRE(sz == word.size());
-        std::string decoded_word(vec.data(), vec.data() + vec.size());
+        std::string decoded_word{vec.begin(), vec.end()};
+        REQUIRE(decoded_word == word);
+
+        encstream.seekg(0);
+
+        std::vector<uint8_t>    dc_vec{brace::Base64().decode(encstream)};
+        decoded_word = std::string{dc_vec.begin(), dc_vec.end()};
         REQUIRE(decoded_word == word);
     }
 }
-#endif
+

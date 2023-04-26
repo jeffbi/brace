@@ -415,7 +415,7 @@ protected:
     /// \return A string containing the encoded data.
     template<typename input_iterator>
     std::string do_encode(input_iterator input, input_iterator input_end,
-                          const char *alphabet)
+                          const char *alphabet) const
     {
         const auto  in_size{input_end - input};
         const auto  out_size{((in_size + 2) / 3) * 4};
@@ -459,7 +459,7 @@ protected:
     /// \param alphabet     Pointer to the alphabet to be used during encoding.
     template<typename input_iterator>
     size_t do_encode(input_iterator input, input_iterator input_end,
-                     std::ostream &outstream, const char *alphabet)
+                     std::ostream &outstream, const char *alphabet) const
     {
         const auto  in_size{input_end - input};
         size_t  chars_written{0};
@@ -509,7 +509,7 @@ protected:
     /// \param instream     brace::BinIStream containing the data to be encoded.
     /// \param alphabet     Pointer to the alphabet to be used during encoding.
     /// \return A string containing the encoded data.
-    std::string do_encode(BinIStream &instream, const char *alphabet)
+    std::string do_encode(BinIStream &instream, const char *alphabet) const
     {
         std::string rv;
 
@@ -553,7 +553,7 @@ protected:
     /// \param instream     brace::BinIStream containing the data to be encoded.
     /// \param outstream    std::ostream to receive the encoded characters.
     /// \param alphabet     Pointer to the alphabet to be used during encoding.
-    size_t do_encode(BinIStream &instream, std::ostream &outstream, const char *alphabet)
+    size_t do_encode(BinIStream &instream, std::ostream &outstream, const char *alphabet) const
     {
         size_t      chars_written{0};
 
@@ -634,7 +634,7 @@ protected:
     do_decode(const std::string_view str,
               const char *alphabet,
               const uint8_t *decode_table,
-              bool ignore_newline)
+              bool ignore_newline) const
     {
         const auto size{str.size()};
 
@@ -661,7 +661,7 @@ protected:
               brace::BinOStream &outstream,
               const char *alphabet,
               const uint8_t *decode_table,
-              bool ignore_newline)
+              bool ignore_newline) const
     {
         const auto size{str.size()};
 
@@ -688,7 +688,7 @@ protected:
               brace::BinOStream &outstream,
               const char *alphabet,
               const uint8_t *decode_table,
-              bool ignore_newline)
+              bool ignore_newline) const
     {
         std::array<char, 4>     quads;
         size_t                  quad_pos{0};
@@ -794,7 +794,7 @@ protected:
     }
 
     std::variant<std::vector<uint8_t>, brace::BasicParseError>
-    do_decode(std::istream &instream, const char *alphabet, const uint8_t *decode_table, bool ignore_newline)
+    do_decode(std::istream &instream, const char *alphabet, const uint8_t *decode_table, bool ignore_newline) const
     {
         std::array<char, 4>     quads;
         size_t                  quad_pos{0};
@@ -889,46 +889,9 @@ protected:
 
         return rv;
     }
-};
 
-/// \brief  The Base64 class provides functions for encoding and decoding data
-///         to and from Base64, as described in RFC 4648
-///         (https://www.rfc-editor.org/rfc/rfc4648), section 4.
-///
-/// \details    The only difference between Base64 and Base64Url is the alphabet used
-///             for encoding. Base64Url uses a "URL and Filename safe" alphabet.
-class Base64 : public Base64Base
-{
-private:
-    /// \brief  Return a pointer to the basic alphabet used for encoding to Base64.
-    /// \return A pointer to the alphabet.
-    static const char *alphabet()
-    {
-        static constexpr char alphabet[]{
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-            'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
-
-        return alphabet;
-    }
-
-    /// \brief  Return a pointer to the decoding table used for decoding from Base64.
-    /// \return A pointer to the decoding table.
-    static const uint8_t *decode_table()
-    {
-        static constexpr uint8_t decode_table[]{
-            0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
-            0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
-            0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x3E, 0x64, 0x64, 0x64, 0x3F,
-            0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
-            0x64, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
-            0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x64, 0x64, 0x64, 0x64, 0x64,
-            0x64, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
-            0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x64, 0x64, 0x64, 0x64, 0x64};
-
-        return decode_table;
-    }
+    virtual const char *alphabet() const = 0;
+    virtual const uint8_t *decode_table() const = 0;
 
 public:
     /// \brief  Encode data from a range of bytes to a Base64 encoded string
@@ -936,7 +899,7 @@ public:
     /// \param end  Iterator at one past the end of the data to be encoded.
     /// \return A string containing the Base64 encoded data.
     template<typename input_iterator>
-    auto encode(input_iterator beg, input_iterator end)
+    auto encode(input_iterator beg, input_iterator end) const
             -> std::enable_if_t<sizeof(*beg) == 1, std::string>
     {
         return do_encode(beg, end, alphabet());
@@ -945,7 +908,7 @@ public:
     /// \brief  Encode data from a binary stream to a Base64 encoded string.
     /// \param instream     brace::BinIStream containing the data to be encoded.
     /// \return A string containing the encoded data.
-    std::string encode(brace::BinIStream &instream)
+    std::string encode(brace::BinIStream &instream) const
     {
         return do_encode(instream, alphabet());
     }
@@ -956,7 +919,7 @@ public:
     /// \param outstream    std::ostream to receive the encoded data.
     /// \return The number of characters written to outstream.
     template<typename input_iterator>
-    auto encode(input_iterator  beg, input_iterator end, std::ostream &outstream)
+    auto encode(input_iterator beg, input_iterator end, std::ostream &outstream) const
             -> std::enable_if_t<sizeof(*beg) == 1, size_t>
     {
         return do_encode(beg, end, outstream, alphabet());
@@ -965,7 +928,7 @@ public:
     /// \brief  Encode data from a binary stream to a standard stream.
     /// \param instream     brace::BinIStream containing the data to be encoded.
     /// \param outstream    std::ostream to receive the encoded characters.
-    size_t encode(brace::BinIStream &instream, std::ostream &outstream)
+    size_t encode(brace::BinIStream &instream, std::ostream &outstream) const
     {
         return do_encode(instream, outstream, alphabet());
     }
@@ -977,7 +940,7 @@ public:
     /// \return On success returns a std::vector of uint8_t objects containing
     /// the decoded bytes.
     /// \exception \c brace::BasicParseError on failure.
-    std::vector<uint8_t> decode(const std::string_view str, bool ignore_newline = false)
+    std::vector<uint8_t> decode(const std::string_view str, bool ignore_newline = false) const
     {
         auto rv{do_decode(str, alphabet(), decode_table(), ignore_newline)};
 
@@ -998,7 +961,7 @@ public:
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
     ///             The state of the output stream can be checked for errors.
-    size_t decode(const std::string_view str, brace::BinOStream &outstream, bool ignore_newline = false)
+    size_t decode(const std::string_view str, brace::BinOStream &outstream, bool ignore_newline = false) const
     {
         auto rv{do_decode(str, outstream, alphabet(), decode_table(), ignore_newline)};
 
@@ -1019,7 +982,7 @@ public:
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
     ///             The state of the input and output streams can be checked for errors.
-    size_t decode(std::istream &instream, brace::BinOStream &outstream, bool ignore_newline = false)
+    size_t decode(std::istream &instream, brace::BinOStream &outstream, bool ignore_newline = false) const
     {
         auto rv{do_decode(instream, outstream, alphabet(), decode_table(), ignore_newline)};
 
@@ -1029,14 +992,14 @@ public:
         return std::get<size_t>(rv);
     }
 
-    /// \brief  Decode Base64 encoded data from a standard stream into vector.
+    /// \brief  Decode Base64 encoded data from a standard stream into a vector.
     /// \param instream         Standard \c istream containing Base64 encoded data.
     /// \param ignore_newline   if \c true the decoder ignores newlines
     ///                         encountered in the encoded data.
     /// \return A \c std::vector<uint8_t> containing the decoded data.
     /// \exception  \c brace::BasicParseError
     std::vector<uint8_t>
-    decode(std::istream &instream, bool ignore_newline = false)
+    decode(std::istream &instream, bool ignore_newline = false) const
     {
         auto rv{do_decode(instream, alphabet(), decode_table(), ignore_newline)};
 
@@ -1044,6 +1007,46 @@ public:
             throw std::get<brace::BasicParseError>(rv);
 
         return std::get<std::vector<uint8_t>>(rv);
+    }
+};
+
+/// \brief  The Base64 class provides functions for encoding and decoding data
+///         to and from Base64, as described in RFC 4648
+///         (https://www.rfc-editor.org/rfc/rfc4648), section 4.
+///
+/// \details    The only difference between Base64 and Base64Url is the alphabet used
+///             for encoding. Base64Url uses a "URL and Filename safe" alphabet.
+class Base64 : public Base64Base
+{
+private:
+    /// \brief  Return a pointer to the basic alphabet used for encoding to Base64.
+    /// \return A pointer to the alphabet.
+    const char *alphabet() const override
+    {
+        static constexpr char alphabet[]{
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+            'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+
+        return alphabet;
+    }
+
+    /// \brief  Return a pointer to the decoding table used for decoding from Base64.
+    /// \return A pointer to the decoding table.
+    const uint8_t *decode_table() const override
+    {
+        static constexpr uint8_t decode_table[]{
+            0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
+            0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
+            0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x3E, 0x64, 0x64, 0x64, 0x3F,
+            0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
+            0x64, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
+            0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x64, 0x64, 0x64, 0x64, 0x64,
+            0x64, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+            0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x64, 0x64, 0x64, 0x64, 0x64};
+
+        return decode_table;
     }
 };
 
@@ -1059,7 +1062,7 @@ private:
 
     /// \brief  Return a pointer to the "URL and Filename safe" alphabet used for encoding to Base64Url
     /// \return A pointer to the alphabet.
-    static const char *alphabet()
+    const char *alphabet() const override
     {
         static constexpr char alphabet[]{
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -1072,7 +1075,7 @@ private:
 
     /// \brief  Return a pointer to the decoding table used for decoding from Base64Url
     /// \return A pointer to the decoding table.
-    static const uint8_t *decode_table()
+    const uint8_t *decode_table() const override
     {
         static constexpr uint8_t decode_table[]{
             0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
@@ -1085,123 +1088,6 @@ private:
             0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x64, 0x64, 0x64, 0x64, 0x64};
 
         return decode_table;
-    }
-
-public:
-    /// \brief  Encode data from a range of bytes to a Base64-URL encoded string
-    /// \param beg  Iterator at the beginning of the data to be encoded.
-    /// \param end  Iterator at one past the end of the data to be encoded.
-    /// \return A string containing the Base64-URL encoded data.
-    template<typename input_iterator>
-    auto encode(input_iterator beg, input_iterator end)
-            -> std::enable_if_t<sizeof(*beg) == 1, std::string>
-    {
-        return do_encode(beg, end, alphabet());
-    }
-
-    /// \brief  Encode data from a binary stream to a Base64-URL encoded string.
-    /// \param instream     brace::BinIStream containing the data to be encoded.
-    /// \return A string containing the encoded data.
-    std::string encode(brace::BinIStream &instream)
-    {
-        return do_encode(instream, alphabet());
-    }
-
-    /// \brief  Encode data from a range of bytes to a stream.
-    /// \param beg  Iterator at the beginning of the input data.
-    /// \param end  Iterator at one past the end of the input data
-    /// \param outstream    std::ostream to receive the encoded data.
-    /// \return The number of characters written to outstream.
-    template<typename input_iterator>
-    auto encode(input_iterator  beg, input_iterator end, std::ostream &outstream)
-            -> std::enable_if_t<sizeof(*beg) == 1, size_t>
-    {
-        return do_encode(beg, end, outstream, alphabet());
-    }
-
-    /// \brief  Encode data from a binary stream to a standard stream.
-    /// \param instream     brace::BinIStream containing the data to be encoded.
-    /// \param outstream    std::ostream to receive the encoded characters.
-    void encode(brace::BinIStream &instream, std::ostream &outstream)
-    {
-        do_encode(instream, outstream, alphabet());
-    }
-
-    /// \brief  Decode a Base64-URL encoded string to its original array of bytes.
-    /// \param str              Base64-URL encoded string data to decode.
-    /// \param ignore_invalid   If \c true the decoder ignores an invalid characters,
-    ///                         such as newlines, encountered in the encoded data.
-    /// \return On success returns a std::vector of uint8_t objects containing
-    /// the decoded bytes.
-    /// \exception brace::BasicParseError on failure.
-    std::vector<uint8_t> decode(const std::string_view str, bool ignore_invalid = false)
-    {
-        auto rv{do_decode(str, alphabet(), decode_table(), ignore_invalid)};
-
-        if (std::holds_alternative<brace::BasicParseError>(rv))
-            throw std::get<brace::BasicParseError>(rv);
-
-        return std::get<std::vector<uint8_t>>(rv);
-    }
-
-    /// \brief  Decode a Base64-URL encoded string to its original array of bytes.
-    /// \param str              Base64-URL encoded string data to decode.
-    /// \param outstream        brace::BinOStream to contain the decoded bytes.
-    /// \param ignore_newline   if \c true the decoder ignores newlines
-    ///                         encountered in the encoded data.
-    /// \return The number of bytes written to the output stream
-    /// \exception  brace::BasicParserError on failure.
-    /// \details    If there are errors in the input string the function throws.
-    ///             If there are errors when writing to the output stream the function
-    ///             returns prematurely with the number of bytes successfully written.
-    ///             The state of the output stream can be checked for errors.
-    size_t decode(const std::string_view str, brace::BinOStream &outstream, bool ignore_newline = false)
-    {
-        auto rv{do_decode(str, outstream, alphabet(), decode_table(), ignore_newline)};
-
-        if (std::holds_alternative<brace::BasicParseError>(rv))
-            throw std::get<brace::BasicParseError>(rv);
-
-        return std::get<size_t>(rv);
-    }
-
-
-    /// \brief  Decode Base64-URL encoded data from a standard stream into a \c brace::BinOStream.
-    /// \param instream         Standard \c istream containing Base64-URL encoded data.
-    /// \param outstream        \c brace::BinOStream to receive the decoded bytes.
-    /// \param ignore_newline   if \c true the decoder ignores newlines
-    ///                         encountered in the encoded data.
-    /// \return The number of bytes written to the output stream
-    /// \exception  brace::BasicParserError on failure.
-    /// \details    If there are errors in the input string the function throws.
-    ///             If there are errors when writing to the output stream the function
-    ///             returns prematurely with the number of bytes successfully written.
-    ///             The state of the input and output streams can be checked for errors.
-    size_t decode(std::istream &instream, brace::BinOStream &outstream, bool ignore_newline = false)
-    {
-        auto rv{do_decode(instream, outstream, alphabet(), decode_table(), ignore_newline)};
-
-        if (std::holds_alternative<brace::BasicParseError>(rv))
-            throw std::get<brace::BasicParseError>(rv);
-
-        return std::get<size_t>(rv);
-    }
-
-    /// \brief  Decode Base64-URL encoded data from a standard stream into vector.
-    /// \param instream         Standard \c istream containing Base64-URL encoded data.
-    /// \param ignore_newline   if \c true the decoder ignores newlines
-    ///                         encountered in the encoded data.
-    /// \return A \c std::vector<uint8_t> containing the decoded data.
-    /// \exception  \c brace::BasicParseError
-    std::vector<uint8_t>
-    decode(std::istream &instream, bool ignore_newline = false)
-    {
-        auto rv{do_decode(instream, alphabet(), decode_table(), ignore_newline)};
-
-        if (std::holds_alternative<brace::BasicParseError>(rv))
-            throw std::get<brace::BasicParseError>(rv);
-
-        return std::get<std::vector<uint8_t>>(rv);
     }
 };
 

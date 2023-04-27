@@ -1056,7 +1056,7 @@ private:
 ///
 /// \details    The only difference between Base64 and Base64Url is the alphabet used
 ///             for encoding. Base64Url uses a "URL and Filename safe" alphabet.
-class Base64Url : Base64Base
+class Base64Url : public Base64Base
 {
 private:
 

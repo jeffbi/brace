@@ -27,7 +27,7 @@ namespace brace {
 ///////////////////////////////////////////////
 
 ///
-/// \brief  Abstract base class for 32-bit SHA2 (SHA-224 and SHA-256) classes.
+/// \brief  Abstract base class for 32-word SHA2 (SHA-224 and SHA-256) classes.
 ///
 /// Derived classes must implement the \c reset function to provide
 /// the initial state data.
@@ -316,7 +316,7 @@ private:
 
 
 ///
-/// \brief  Abstract base class for 64-bit SHA2 (SHA-384 and SHA-512) classes.
+/// \brief  Abstract base class for 64-word SHA2 (SHA-384 and SHA-512) classes.
 ///
 /// Derived classes must implement the \c reset function to provide
 /// the initial state data.

@@ -8,7 +8,7 @@
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 //////////////////////////////////////////////////////////////////////
 
-/// \file base64.h
+/// \file parseerror.h
 ///
 /// \author Jeff Bienstadt
 #ifndef BRACE_LIB_PARSEERROR_INC

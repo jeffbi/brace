@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
+#include "brace/base16.h"
 #include "brace/base32.h"
 #include "brace/base64.h"
 #include "brace/binastream.h"
-
 #include "brace/binfstream.h"
 
 std::string test_data64[][2] = {
@@ -63,6 +63,17 @@ std::string test_data32hex[][2] = {
     {"foobar",  "CPNMUOJ1E8======"}
 };
 
+std::string test_data16[][2]
+{
+    {"",        ""},
+    {"f",       "66"},
+    {"fo",      "666F"},
+    {"foo",     "666F6F"},
+    {"foob",    "666F6F62"},
+    {"fooba",   "666F6F6261"},
+    {"foobar",  "666F6F626172"}
+};
+
 std::vector<uint8_t> load_bin_file(const std::string &path)
 {
     constexpr size_t        size{4 * 1024};
@@ -106,7 +117,6 @@ void test_encoding_from_binary_stream_to_standard_stream(
 
     // Encode from the memory stream to the encoded stream.
     auto chars_written{coder.encode(instream, encstream)};
-    REQUIRE(chars_written % 4 == 0);
     REQUIRE(encstream.str() == result);
 
     encstream.clear();
@@ -207,52 +217,23 @@ TEST_CASE("Test Base64Url encoding from binary stream to standard stream", "[bas
         test_encoding_from_binary_stream_to_standard_stream(word, result, brace::Base64Url{});
     }
 }
-
-
-TEST_CASE("Initial test of Base32")
+TEST_CASE("Test Base64 encoding from external file", "[base64]")
 {
-    for (auto &[word, result] : test_data32)
-    {
-        std::string encoded{brace::Base32{}.encode(word.begin(), word.end())};
+    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *head{"JVBERi0xLjIKJcfs"};
+    constexpr const char   *tail{"OTM0CiUlRU9GCg=="};
 
-        REQUIRE(encoded == result);
-
-        auto decoded{brace::Base32{}.decode(encoded, true)};
-
-        auto sz = decoded.size();
-
-        // Test decoding what we encoded.
-        std::vector<uint8_t> v{word.begin(), word.end()};
-        REQUIRE(brace::Base32{}.decode(result) == v);
-
-        // Test the encode function template using vector iterators.
-        REQUIRE(brace::Base32{}.encode(v.begin(), v.end()) == result);
-    }
-
-
-    std::vector<uint8_t>    vec{load_bin_file("test_data/rfc1321.txt.pdf")};
-
-    constexpr size_t encoded_data_length{39032};
-
-    std::string enc{brace::Base32{}.encode(vec.begin(), vec.end())};
-    REQUIRE(enc.size() == encoded_data_length);
-    std::string head{enc.substr(0, 16)};
-    std::string tail{enc.substr(enc.size() - 16, 16)};
-    REQUIRE(head == "EVIEIRRNGEXDECRF");
-    REQUIRE(tail == "GM2AUJJFIVHUMCQ=");
-
-    brace::BinIFStream  stream{"test_data/rfc1321.txt.pdf"};
-    std::string enc_from_stream{brace::Base32{}.encode(stream)};
-    REQUIRE(enc == enc_from_stream);
-    stream.close();
-
-    stream.open("test_data/rfc4648.txt.pdf");
-    enc_from_stream = brace::Base32{}.encode(stream);
-    head = enc_from_stream.substr(0, 16);
-    tail = enc_from_stream.substr(enc_from_stream.size() - 16, 16);
-    REQUIRE(head == "EVIEIRRNGEXDECRF");
-    REQUIRE(tail == "BISSKRKPIYFA====");
+    test_encoding_from_external_file(brace::Base64{}, path, head, tail);
 }
+TEST_CASE("Test Base64Url encoding from external file", "[base64Url]")
+{
+    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *head{"JVBERi0xLjIKJcfs"};
+    constexpr const char   *tail{"OTM0CiUlRU9GCg=="};
+
+    test_encoding_from_external_file(brace::Base64Url{}, path, head, tail);
+}
+
 
 TEST_CASE("Simple Base32 round-trip tests", "[base32]")
 {
@@ -299,23 +280,6 @@ TEST_CASE("Test Base32Hex encoding from binary stream to standard stream", "[bas
         test_encoding_from_binary_stream_to_standard_stream(word, result, brace::Base32Hex{});
     }
 }
-
-TEST_CASE("Test Base64 encoding from external file", "[base64]")
-{
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
-    constexpr const char   *head{"JVBERi0xLjIKJcfs"};
-    constexpr const char   *tail{"OTM0CiUlRU9GCg=="};
-
-    test_encoding_from_external_file(brace::Base64{}, path, head, tail);
-}
-TEST_CASE("Test Base64Url encoding from external file", "[base64Url]")
-{
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
-    constexpr const char   *head{"JVBERi0xLjIKJcfs"};
-    constexpr const char   *tail{"OTM0CiUlRU9GCg=="};
-
-    test_encoding_from_external_file(brace::Base64Url{}, path, head, tail);
-}
 TEST_CASE("Test Base32 encoding from external file", "[base32]")
 {
     constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
@@ -331,4 +295,35 @@ TEST_CASE("Test Base32Hex encoding from external file", "[base32Hex]")
     constexpr const char   *tail{"6CQ0K9958L7KC2G="};
 
     test_encoding_from_external_file(brace::Base32Hex{}, path, head, tail);
+}
+
+TEST_CASE("Simple Base16 round-trip tests", "[base16]")
+{
+    for (const auto &[word, result] : test_data16)
+    {
+        simple_round_trip(word, result, brace::Base16{});
+    }
+}
+TEST_CASE("Test Base16 encoding from binary stream", "[base16]")
+{
+    for (const auto &[word, result] : test_data16)
+    {
+        brace::BinIArrayStream  stream((uint8_t *)word.data(), (uint8_t *)word.data() + word.size());
+        REQUIRE(brace::Base16().encode(stream) == result);
+    }
+}
+TEST_CASE("Test Base16 encoding from binary stream to standard stream", "[base16]")
+{
+    for (const auto &[word, result] : test_data16)
+    {
+        test_encoding_from_binary_stream_to_standard_stream(word, result, brace::Base16{});
+    }
+}
+TEST_CASE("Test Base16 encoding from external file", "[base16]")
+{
+    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *head{"255044462D312E32"};
+    constexpr const char   *tail{"340A2525454F460A"};
+
+    test_encoding_from_external_file(brace::Base16{}, path, head, tail);
 }

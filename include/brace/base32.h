@@ -8,19 +8,16 @@
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 //////////////////////////////////////////////////////////////////////
 
-/// \file base64.h
+/// \file base32.h
 ///
 /// \author Jeff Bienstadt
 #ifndef BRACE_LIB_BASE32_INC
 #define BRACE_LIB_BASE32_INC
 
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <functional>
 #include <istream>
-#include <iterator>
-#include <optional>
 #include <ostream>
 #include <string>
 #include <string_view>

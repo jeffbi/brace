@@ -14,13 +14,10 @@
 #ifndef BRACE_LIB_BASE64_INC
 #define BRACE_LIB_BASE64_INC
 
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <functional>
 #include <istream>
-#include <iterator>
-#include <optional>
 #include <ostream>
 #include <string>
 #include <string_view>

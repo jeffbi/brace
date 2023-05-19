@@ -219,17 +219,17 @@ TEST_CASE("Test Base64Url encoding from binary stream to standard stream", "[bas
 }
 TEST_CASE("Test Base64 encoding from external file", "[base64]")
 {
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *path{"test_data/rfc4648.txt.pdf"};
     constexpr const char   *head{"JVBERi0xLjIKJcfs"};
-    constexpr const char   *tail{"OTM0CiUlRU9GCg=="};
+    constexpr const char   *tail{"MjI5MTMKJSVFT0YK"};
 
     test_encoding_from_external_file(brace::Base64{}, path, head, tail);
 }
 TEST_CASE("Test Base64Url encoding from external file", "[base64Url]")
 {
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *path{"test_data/rfc4648.txt.pdf"};
     constexpr const char   *head{"JVBERi0xLjIKJcfs"};
-    constexpr const char   *tail{"OTM0CiUlRU9GCg=="};
+    constexpr const char   *tail{"MjI5MTMKJSVFT0YK"};
 
     test_encoding_from_external_file(brace::Base64Url{}, path, head, tail);
 }
@@ -282,17 +282,17 @@ TEST_CASE("Test Base32Hex encoding from binary stream to standard stream", "[bas
 }
 TEST_CASE("Test Base32 encoding from external file", "[base32]")
 {
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *path{"test_data/rfc4648.txt.pdf"};
     constexpr const char   *head{"EVIEIRRNGEXDECRF"};
-    constexpr const char   *tail{"GM2AUJJFIVHUMCQ="};
+    constexpr const char   *tail{"BISSKRKPIYFA===="};
 
     test_encoding_from_external_file(brace::Base32{}, path, head, tail);
 }
 TEST_CASE("Test Base32Hex encoding from external file", "[base32Hex]")
 {
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *path{"test_data/rfc4648.txt.pdf"};
     constexpr const char   *head{"4L848HHD64N342H5"};
-    constexpr const char   *tail{"6CQ0K9958L7KC2G="};
+    constexpr const char   *tail{"18IIAHAF8O50===="};
 
     test_encoding_from_external_file(brace::Base32Hex{}, path, head, tail);
 }
@@ -321,9 +321,9 @@ TEST_CASE("Test Base16 encoding from binary stream to standard stream", "[base16
 }
 TEST_CASE("Test Base16 encoding from external file", "[base16]")
 {
-    constexpr const char   *path{"test_data/rfc1321.txt.pdf"};
+    constexpr const char   *path{"test_data/rfc4648.txt.pdf"};
     constexpr const char   *head{"255044462D312E32"};
-    constexpr const char   *tail{"340A2525454F460A"};
+    constexpr const char   *tail{"330A2525454F460A"};
 
     test_encoding_from_external_file(brace::Base16{}, path, head, tail);
 }

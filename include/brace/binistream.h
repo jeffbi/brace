@@ -26,11 +26,11 @@ namespace brace
 class BinIStream : virtual public BinIos
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 protected:
     /// \brief  Construct a BinIStream object with a stream implementation object.
@@ -279,6 +279,7 @@ public:
         return *this;
     }
 
+#if 0
     /// \brief  Extract a single byte from an input byte stream.
     /// \param b    Byte value to be read.
     /// \return *this
@@ -287,9 +288,11 @@ public:
     //{
     //    return get(b);
     //}
-
+#endif
 
 protected:
+    /// @brief  Swap the contents of this BinIStream object with another.
+    /// @param other    Another BinIStream object whose contents is to be swapped.
     void swap(BinIStream &other)
     {
         if (this != std::addressof(other))
@@ -307,11 +310,11 @@ private:
 class BinIOStream : public BinIStream,  public BinOStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     /// \brief Construct a BinIOStream object with a binary stream implementation object.
@@ -348,6 +351,8 @@ public:
     ~BinIOStream()
     {}
 
+    /// \brief  Swap the contents of this BinIOStream object with another.
+    /// \param other    Another BinIOStream object whose contents is to be swapped.
     void swap(BinIOStream &other)
     {
         if (this != std::addressof(other))

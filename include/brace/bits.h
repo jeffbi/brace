@@ -12,7 +12,7 @@
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 //////////////////////////////////////////////////////////////////////
 
-/// \file Bits.h
+/// \file bits.h
 /// \brief  Declaration and implementation of basic bit-twiddling free functions.
 /// \author Jeff Bienstadt
 

@@ -36,11 +36,11 @@ private:
     static constexpr std::ios_base::iostate state_mask = std::ios_base::goodbit | std::ios_base::eofbit | std::ios_base::badbit | std::ios::failbit;
 
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     BinIos()
@@ -230,11 +230,15 @@ public:
     }
 
 protected:
+    /// \brief  Clear specified state bits
+    /// \param bits_to_clear    Specifies which state bits to clear.
     void clear_state_bit(std::ios_base::iostate bits_to_clear)
     {
         _state_bits &= ~(bits_to_clear & state_mask);
     }
 
+    /// \brief  Move the contents of another BinStreamImpl object into this one.
+    /// \param other    The other BinStreamImpl object whose contents is to be moved.
     void move(BinIos &other)
     {
         _state_bits = other._state_bits;
@@ -245,6 +249,8 @@ protected:
         other._endian = Endian::Native;
     }
 
+    /// \brief  Swap the contents of this object with that of another BinIos object.
+    /// \param other    Another BinIos object whose content is to be swapped.
     void swap(BinIos &other)
     {
         if (this != std::addressof(other))
@@ -255,6 +261,8 @@ protected:
         }
     }
 
+    /// \brief  Initialize this BinIos object with a pointer to an implementation object.
+    /// \param impl A pointer to a BinStreamImpl object that will perform internal operations.
     void init(BinStreamImpl *impl)
     {
         _impl = impl;

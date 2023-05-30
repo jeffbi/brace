@@ -39,6 +39,101 @@ namespace brace {
 ///
 class HashAlgorithm
 {
+protected:
+    /// \brief  The SHA Ch function.
+    /// \tparam T   The type of the input and output data
+    /// \param x    The first of three words
+    /// \param y    The second of three words
+    /// \param z    The third of three words
+    /// \return A word of type T.
+    template <typename T>
+    static T SHA_Ch(T x, T y, T z) noexcept
+    {
+        //return ((x & (y ^ z)) ^ z);
+        return (x & y) ^ (~x & z);
+    }
+
+    /// \brief  The SHA Maj function.
+    /// \tparam T   The type of the input and output data
+    /// \param x    The first of three words
+    /// \param y    The second of three words
+    /// \param z    The third of three words
+    /// \return A word of type T.
+    template <typename T>
+    static T SHA_Maj(T x, T y, T z) noexcept
+    {
+        //return ((x & (y | z)) | (y & z));
+        return (x & y) ^ (x & z) ^ (y & z);
+    }
+
+    /// \brief  The SHA Parity function.
+    /// \tparam T   The type of the input and output data
+    /// \param x    The first of three words
+    /// \param y    The second of three words
+    /// \param z    The third of three words
+    /// \return A word of type T.
+    template <typename T>
+    static T SHA_Parity(T x, T y, T z) noexcept
+    {
+        return (x ^ y ^ z);
+    }
+
+    /// \brief  A large integer, with overflow detection.
+    /// \details    This class is specific to the hash operations and is _not_ intended
+    ///             to be a general-purpose large-integer class.
+    template <typename T>
+    class HashLength
+    {
+    public:
+        /// \brief  Default construct a HashLength object.
+        HashLength() noexcept
+        : _high{(T)0},
+            _low{(T)0}
+        {}
+
+        /// \brief  Increment a HashLength object.
+        /// \return *this
+        /// \exception  std::range_error on overflow.
+        HashLength &operator++()
+        {
+            _low += CHAR_BIT;
+            if (_low == 0)
+                if (++_high == 0) // overflow!
+                    throw std::range_error("Hash maximum length exceeded.");
+
+            return *this;
+        }
+
+        /// @brief  Reset a HashLength object to zero (0)
+        void reset() noexcept
+        {
+            _high = _low = (T)0;
+        }
+
+        /// @brief  Return the high-order part of a HashLength object.
+        /// @return The high-order part of the object.
+        T high() const noexcept
+        {
+            return _high;
+        }
+
+        /// @brief Return the low-order part of a HashLength object.
+        /// @return The low-order part of the object.
+        T low() const noexcept
+        {
+            return _low;
+        }
+
+    private:
+        T   _high;
+        T   _low;
+    };
+
+    /// @brief  A HashLength using 64 bits.
+    using HashLength64_t  = HashLength<uint32_t>;   // a 64-bit hash length
+    /// @brief  A HashLength using 128 bits.
+    using HashLength128_t = HashLength<uint64_t>;   // a 128-bit hash length
+
 public:
     ///
     /// \brief Create a string representation of a hash.
@@ -335,73 +430,6 @@ protected:
 private:
     int _hash_size; // Hash size in bits
 };
-
-
-template <typename T>
-inline T SHA_Ch(T x, T y, T z)
-{
-    //return ((x & y) ^ ((~x) & z))
-    return ((x & (y ^ z)) ^ z);
-}
-
-template <typename T>
-inline T SHA_Maj(T x, T y, T z)
-{
-    //return ((x & y) ^ (x & z) ^ (y & z));
-    return ((x & (y | z)) | (y & z));
-}
-
-template <typename T>
-inline T SHA_Parity(T x, T y, T z)
-{
-    return (x ^ y ^ z);
-}
-
-
-// A large integer, with overflow detection.
-//
-// This class is specific to the hash operations and is NOT intended to be a
-// general-purpose large-integer class.
-template <typename T>
-class HashLength
-{
-public:
-    HashLength() noexcept
-      : _high{(T)0},
-        _low{(T)0}
-    {}
-
-    HashLength &operator++()
-    {
-        _low += CHAR_BIT;
-        if (_low == 0)
-            if (++_high == 0) // overflow!
-                throw std::length_error("Hash maximum length exceeded.");
-
-        return *this;
-    }
-
-    void reset() noexcept
-    {
-        _high = _low = (T)0;
-    }
-
-    T high() const noexcept
-    {
-        return _high;
-    }
-    T low() const noexcept
-    {
-        return _low;
-    }
-
-private:
-    T   _high;
-    T   _low;
-};
-
-using HashLength64_t  = HashLength<uint32_t>;   // a 64-bit hash length
-using HashLength128_t = HashLength<uint64_t>;   // a 128-bit hash length
 
 } // namespace brace
 

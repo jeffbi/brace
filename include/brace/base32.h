@@ -30,17 +30,36 @@
 
 namespace brace {
 
+/// \brief  The class Base32Base is an abstract base class for the Base32 and Base32Hex encoding
+///         and decoding classes.
 class Base32Base
 {
 protected:
+    /// \brief  Padding character.
     constexpr static char           pad_char{'='};
+    /// \brief  Text of bad-character error message.
     constexpr static const char    *bad_char_msg = "Invalid character";
 
+    /// \brief  Default construct a Base32Base object. This constructor
+    ///         is protected.
     Base32Base()
     {}
 
+    /// \brief  Return a pointer to the alphabet. Override this function in derived
+    ///         classes to provide an alphabet for the specific encoding/decoding algorithms.
+    /// \return A pointer to the alphabet to be used for encoding.
     virtual const char *alphabet() const = 0;
+
+    /// \brief  Return a pointer to the decoding table. Override this function in
+    ///         derived classes to provide a decoding table for the specific decoding algorithm.
+    /// \return A pointer to the decoding table to be used for decoding encoded data.
     virtual const uint8_t *decode_table() const = 0;
+
+    /// \brief  Determine if a character is a valid member of the encoding alphabet.
+    ///         Override this function in derived classes to determine if the character
+    ///         is valid for a specific alphabet.
+    /// \param ch   The character to check
+    /// \return \c true if ch is a valid character in the encoding alphabet, \c false otherwise.
     virtual bool is_valid_character(char ch) const = 0;
 
 private:
@@ -423,8 +442,7 @@ public:
     ///                         newline characters are considered to be invalid.
     /// \return On success returns a std::vector of uint8_t objects containing
     /// the decoded bytes.
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     std::vector<uint8_t> decode(std::string_view str, bool handle_newline = false) const
     {
         std::vector<uint8_t>    rv;
@@ -463,8 +481,7 @@ public:
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
     /// \return The number of bytes written to the output stream
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -504,8 +521,7 @@ public:
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
     /// \return The number of bytes written to the output stream
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -537,9 +553,8 @@ public:
     /// \param handle_newline   If \c true, newline characters are effectively
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
-    /// \return A \c std::vector<uint8_t> containing the decoded data.
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \return A std::vector<uint8_t> containing the decoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     std::vector<uint8_t>
     decode(std::istream &instream, bool handle_newline = false) const
     {
@@ -562,10 +577,16 @@ public:
     }
 };
 
+/// \brief  The Base32 class provides functions for encoding and decoding data
+///         to and from Base32, as described in RFC 4648, section 6
+///         (https://www.rfc-editor.org/rfc/rfc4648#section-6).
+///
+/// \details    The only difference between Base32 and Base32Hex is the alphabet used
+///             for encoding.
 class Base32 : public Base32Base
 {
 private:
-    const char *alphabet() const override
+    [[nodiscard]] const char *alphabet() const override
     {
         static constexpr char alphabet[] {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -575,7 +596,7 @@ private:
         return alphabet;
     }
 
-    const uint8_t *decode_table() const override
+    [[nodiscard]] const uint8_t *decode_table() const override
     {
         static constexpr uint8_t decode_table[] {
             0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
@@ -591,17 +612,23 @@ private:
         return decode_table;
     }
 
-    bool is_valid_character(char ch) const override
+    [[nodiscard]] bool is_valid_character(char ch) const override
     {
         return (   ((ch >= 'A') && (ch <= 'Z'))
                 || ((ch >= '2') && (ch <= '7')));
     }
 };
 
+/// \brief  The Base32Hex class provides functions for encoding and decoding data
+///         to and from Base32Hex, as described in RFC 4648, section 7
+///         (https://www.rfc-editor.org/rfc/rfc4648#section-7).
+///
+/// \details    The only difference between Base32 and Base32Hex is the alphabet used
+///             for encoding.
 class Base32Hex : public Base32Base
 {
 private:
-    const char *alphabet() const override
+    [[nodiscard]] const char *alphabet() const override
     {
         static constexpr char alphabet[] {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -611,7 +638,7 @@ private:
         return alphabet;
     }
 
-    const uint8_t *decode_table() const override
+    [[nodiscard]] const uint8_t *decode_table() const override
     {
         static constexpr uint8_t decode_table[] {
             0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
@@ -627,7 +654,7 @@ private:
         return decode_table;
     }
 
-    bool is_valid_character(char ch) const override
+    [[nodiscard]] bool is_valid_character(char ch) const override
     {
         return (   ((ch >= '0') && (ch <= '9'))
                 || ((ch >= 'A') && (ch <= 'V')));

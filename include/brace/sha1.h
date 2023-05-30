@@ -30,7 +30,7 @@ namespace brace {
 /// \note   The SHA-1 hash algorithm is not considered secure and
 ///         its use is \b not recommended for security-related hashing.
 ///         Use the more secure SHA-2 family of hash algorithms such as
-///         SHA-256 or SHA-521 instead.
+///         SHA-256 or SHA-512 instead.
 class SHA1 : public HashAlgorithm
 {
 public:

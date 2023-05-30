@@ -48,7 +48,7 @@ protected:
       : HashAlgorithm(hash_size)
     {}
 
-    /// \brief  Called by derived class' \c reset function with a
+    /// \brief  Called by derived class' reset function with a
     ///         pointer to the appropriate initial state values.
     void initialize(const uint32_t *initial_state_values) noexcept
     {

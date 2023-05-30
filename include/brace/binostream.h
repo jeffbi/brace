@@ -24,11 +24,11 @@ namespace brace
 class BinOStream : virtual public BinIos
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 protected:
     /// \brief  Construct a BinOStream object with a stream implementation object.
@@ -63,6 +63,8 @@ protected:
     virtual ~BinOStream()
     {}
 
+    /// \brief  Swap the contents of this BinOStream object with another.
+    /// \param other    Another BinOStream oblect whose conetnts is to be swapped.
     void swap(BinOStream &other)
     {
         if (this != std::addressof(other))

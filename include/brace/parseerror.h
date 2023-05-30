@@ -47,8 +47,13 @@ public:
         , _pos{pos}
     {}
 
-    BasicParseError(const BasicParseError &) noexcept = default;
-    BasicParseError & operator=(const BasicParseError &) noexcept = default;
+    /// \brief  Construct a BasicParseError by copying data from another.
+    /// \param other    Another BasicParseError from which to copy content.
+    BasicParseError(const BasicParseError &other) noexcept = default;
+    /// @brief  Assign values into this BasicParseError from another.
+    /// @param other    Amptjer BasicParseError from which to copy content.
+    /// @return *this
+    BasicParseError & operator=(const BasicParseError &other) noexcept = default;
 
     /// \brief  Retrieve the error line number.
     /// \return The line number where the error occurred.

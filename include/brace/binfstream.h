@@ -28,11 +28,11 @@ namespace brace
 class BinFileStreamImpl : public BinStreamImpl
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     //
@@ -75,6 +75,8 @@ public:
         close();
     }
 
+    /// \brief  Swap the contents of this BinFileStreamImpl object with another.
+    /// \param other    Another BinFileStreamImpl object whose contents is to be swapped.
     void swap(BinFileStreamImpl &other)
     {
         if (this != std::addressof(other))
@@ -377,11 +379,11 @@ private:
 class BinIFStream : public BinIStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     /// \brief  Default construct a BinIFStream object. No file is associated with the constructed object.
@@ -460,6 +462,8 @@ public:
         close();
     }
 
+    /// \brief  Swap the contents of this BinIFStream object with another.
+    /// \param other    Another BinIFStream object whose contents is to be swapped.
     void swap(BinIFStream &other)
     {
         if (this != std::addressof(other))
@@ -539,7 +543,8 @@ public:
     }
 
 protected:
-
+    /// \brief  Set the fail and/or eof bits from the current state of the
+    ///         underlying FILE object
     void set_fail_or_eof()
     {
         if (_impl.eof())
@@ -556,11 +561,11 @@ private:
 class BinOFStream : public BinOStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     /// \brief  Default construct a BinOFStream object. No file is associated with the constructed object.
@@ -625,6 +630,8 @@ public:
         close();
     }
 
+    /// \brief  Swap the contents of this BinOFStream object with another.
+    /// \param other    Another BinOFStream object whose contents is to be swapped.
     void swap(BinOFStream &other)
     {
         if (this != std::addressof(other))
@@ -704,6 +711,8 @@ public:
     }
 
 protected:
+    /// \brief  Set the fail and/or eof bits from the current state of the
+    ///         underlying FILE object
     void set_fail_or_eof()
     {
         if (_impl.eof())
@@ -721,11 +730,11 @@ private:
 class BinFStream : public BinIOStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 
 public:
@@ -831,6 +840,8 @@ public:
         close();
     }
 
+    /// \brief  Swap the contents of this BinFStream object with another.
+    /// \param other    Another BinFStream object whose contents is to be swapped.
     void swap(BinFStream &other)
     {
         if (this != std::addressof(other))
@@ -912,6 +923,8 @@ public:
     }
 
 protected:
+    /// \brief  Set the fail and/or eof bits from the current state of the
+    ///         underlying FILE object
     void set_fail_or_eof()
     {
         if (_impl.eof())

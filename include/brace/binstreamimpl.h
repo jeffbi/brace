@@ -20,16 +20,21 @@
 namespace brace
 {
 
+/// \brief  A base class for concrete implementations for binary stream classes.
+/// \details    The implementation classes provide the equivalent of the buffer classes
+///             used in the standard streams. Derive from this class to provide
+///             implementations for binary streams.
 class BinStreamImpl
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
+    /// \brief  Destroy a BinStreamImpl object.
     virtual ~BinStreamImpl()
     {}
 
@@ -38,22 +43,30 @@ public:
     // Construction
     //
 
-    BinStreamImpl()
+    /// \brief  Default construct a BinStreamImpl object.
+    BinStreamImpl() noexcept
     {}
 
+    /// \brief  The copy constructor is deleted.
     BinStreamImpl(const BinStreamImpl &) = delete;
+    /// \brief  The copy assignment operator is deleted.
     BinStreamImpl &operator=(const BinStreamImpl &) = delete;
 
-    BinStreamImpl(BinStreamImpl &&other)
-    {}
-
-    BinStreamImpl &operator=(BinStreamImpl &&rhs)
-    {
-        return *this;
-    }
+    /// \brief  Move constructor. Construct a BinStreamImpl object by moving
+    ///         the contents of another BinStreamImpl object.
+    /// \param other    BinStreamImpl object whose contents is to be moved.
+    BinStreamImpl(BinStreamImpl &&other) noexcept = default;
+    /// \brief  Move assignment operator. Move-assigns the content from rhs to
+    ///         this object.
+    /// \param rhs  The BinStreamImpl object whose contens is to be moved from.
+    /// \return *this
+    BinStreamImpl &operator=(BinStreamImpl &&rhs) noexcept = default;
 
 protected:
-    void swap(BinStreamImpl &other)
+    /// \brief  Swap the contents of this object with another BinStreamImpl object.
+    /// \param other    The object to be swapped with.
+    /// \details    This swap function has no effect.
+    void swap(BinStreamImpl &other) noexcept
     {}
 
 public:
@@ -83,7 +96,7 @@ public:
 
     /// \brief  Clear any error or end of file conditions
     ///
-    /// The base class version of this function has no effect and simply returns \c true.
+    /// The base class version of this function has no effect
     /// Derived classes may override this function to clear any error states.
     virtual void clearerr()
     {}

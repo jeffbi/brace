@@ -109,3 +109,8 @@ ipch/
 # Visual Studio Code
 #
 .vscode/
+
+#
+# Doxygen-generated documentation
+#
+doc/

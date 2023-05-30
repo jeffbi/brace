@@ -53,14 +53,15 @@ namespace brace {
 class MD5 : public HashAlgorithm
 {
 private:
-    using uint1 = uint8_t;
-    using uint4 = uint32_t;
+    using uint1 = uint8_t;  ///< Define a 1-byte type.
+    using uint4 = uint32_t; ///< Define a 4-byte integer type.
 
 public:
-    using size_type = uint32_t;
-    static constexpr size_type  message_block_size{64};
+    using size_type = uint32_t; ///< Define a type used for size
+    static constexpr size_type  message_block_size{64}; ///< message block size
 
 public:
+    /// \brief  Default construct an MD5 hasher object.
     MD5() noexcept
       : HashAlgorithm(128)
     {

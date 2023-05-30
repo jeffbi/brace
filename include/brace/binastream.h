@@ -22,16 +22,16 @@
 namespace brace
 {
 
-/// \brief  The BinArrayStreamImpl classe provides an implementation for a binary stream
+/// \brief  The BinArrayStreamImpl class provides an implementation for a binary stream
 ///         backed by a fixed-length array of bytes.
 class BinArrayStreamImpl : public BinStreamImpl
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     //
@@ -119,6 +119,8 @@ public:
     ~BinArrayStreamImpl() noexcept
     {}
 
+    /// \brief  Swap the content of this BinArrayStreamImpl with another.
+    /// \param other    Other BinArrayStreamImpl to swap content with.
     void swap(BinArrayStreamImpl &other)
     {
         if (this != std::addressof(other))
@@ -443,11 +445,11 @@ private:
 class BinIArrayStream : public BinIStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     /// \brief  Construct a BinIArrayStream object from a fixed-length array of bytes.
@@ -489,6 +491,8 @@ public:
         return *this;
     }
 
+    /// \brief  Swap the contents of this BinIArrayStream object with another.
+    /// \param other    Another BinIArrayStream object to swap contents with.
     void swap(BinIArrayStream &other)
     {
         if (this != std::addressof(other))
@@ -507,27 +511,27 @@ private:
 class BinOArrayStream : public BinOStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     /// \brief  Construct a BinOArrayStream object from a fixed-length array of bytes.
     /// \param a    Pointer to an array of bytes to be the backing data of the stream.
     /// \param size Size in bytes of the byte array pointed to by a.
-    BinOArrayStream(byte_type *s, size_t size)
+    BinOArrayStream(byte_type *a, size_t size)
         : BinOStream(std::addressof(_impl))
-        , _impl{s, size}
+        , _impl{a, size}
     {}
 
     /// \brief  Construct a BinOArrayStream object from a fixed-length array of bytes.
     /// \param a    Pointer to an array of bytes to be the backing data of the stream.
     /// \param aend Pointer to one past the last byte in the array pointed to by a.
-    BinOArrayStream(byte_type *s, byte_type *send)
+    BinOArrayStream(byte_type *a, byte_type *aend)
         : BinOStream(&_impl)
-        , _impl{s, send}
+        , _impl{a, aend}
     {}
 
     /// \brief  The copy constructor is deleted. The BinOArrayStream is not copy constructable.
@@ -541,6 +545,7 @@ public:
         : BinOStream(std::move(other))
         , _impl{std::move(other._impl)}
     {}
+
     /// \brief  Assign to a BinOArrayStream object by moving data from another BinOArrayStream object
     BinOArrayStream &operator=(BinOArrayStream &&rhs) noexcept
     {
@@ -553,6 +558,8 @@ public:
         return *this;
     }
 
+    /// \brief  Swap the contents of this BinOArrayStream object with another.
+    /// \param other    Another BinOArrayStream object whose contents is to be swapped.
     void swap(BinOArrayStream &other)
     {
         if (this != std::addressof(other))
@@ -570,11 +577,11 @@ private:
 class BinArrayStream : public BinIOStream
 {
 public:
-    using byte_type     = uint8_t;
-    using traits_type   = std::char_traits<char>;
-    using int_type      = traits_type::int_type;
-    using pos_type      = std::streampos;
-    using off_type      = std::streamoff;
+    using byte_type     = uint8_t;                  ///< Type used to represent a byte
+    using traits_type   = std::char_traits<char>;   ///< Type used for character traits
+    using int_type      = traits_type::int_type;    ///< Type used for integers
+    using pos_type      = std::streampos;           ///< Type used for positioning
+    using off_type      = std::streamoff;           ///< Type used for offsets
 
 public:
     /// \brief  Construct a BinArrayStream object from a fixed-length array of bytes.
@@ -621,9 +628,12 @@ public:
         return *this;
     }
 
+    /// \brief  Destroy a BinArrayStream
     ~BinArrayStream()
     {}
 
+    /// \brief  Swap the contents of this BinArrayStream object with another.
+    /// \param other    Another BinArrayStream object whose contents is to be swapped.
     void swap(BinArrayStream &other)
     {
         if (this != std::addressof(other))

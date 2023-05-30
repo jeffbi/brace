@@ -34,11 +34,16 @@ namespace brace
 #error "Unrecognized compiler!"
 #endif
 
+/// @brief  Represents the various byte endian types.
 enum class Endian
 {
+    /// \brief  Indicates little-endian
     Little  = BRACE_BYTE_ORDER_LITTLE_ENDIAN,
+    /// \brief  Indicates big-endian
     Big     = BRACE_BYTE_ORDER_BIG_ENDIAN,
+    /// \brief  Indicates the native endian type
     Native  = BRACE_BYTE_ORDER,
+    /// \brief  Indicates network endian
     Network = Big
 };
 
@@ -102,6 +107,10 @@ inline void byte_swap_sized<8>(char *data)
 }
 /// \endcond
 
+/// \brief  Swap the bytes of a given value.
+/// \tparam T       The type of value.
+/// \param value    The object to byte-swap.
+/// \return The result of swapping the bytes of value.
 template<typename T>
 inline
 typename std::enable_if<std::is_arithmetic_v<T> ||
@@ -116,14 +125,21 @@ byte_swap(T value)
 
 /// \brief  Swap the bytes of a value in-place, modifying the original value
 ///         rather than returning a new value.
+/// \tparam T       The type of value.
+/// \param value    The object to be byte-swapped
 template<typename T>
 inline void byte_swap_in_place(T &value)
 {
     byte_swap_sized<sizeof(T)>(reinterpret_cast<char *>(&value));
 }
 
+/// \brief
+
 /// \brief  Given a value of type T, return a new value of type T
-///         whose bytes are ordered as big-endian
+///         whose bytes are ordered as Big Endian.
+/// \tparam T       The type of value.
+/// \param value    The value to be byte-ordered as Big Endian.
+/// \return The result of value ordered as big-endian.
 template<typename T>
 inline T to_big_endian(T value)
 {

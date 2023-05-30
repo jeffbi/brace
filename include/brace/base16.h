@@ -29,14 +29,20 @@
 
 namespace brace {
 
+/// \brief  The Base16 class provides functions for encoding and decoding data
+///         to and from Base16, as described in RFC 4648, section 8
+///         (https://www.rfc-editor.org/rfc/rfc4648.html#section-8).
 class Base16
 {
 public:
+    /// @brief  Construct a Base16 object.
     Base16()
     {}
 
 private:
-    static const char *alphabet() noexcept
+    /// \brief  Return a pointer to the Base16 alphabet.
+    /// \return A pointer to the Base16 alphabet.
+    [[nodiscard]] static const char *alphabet() noexcept
     {
         static constexpr char alphabet[] {
             '0', '1', '2', '3', '4', '5', '6', '7',
@@ -46,14 +52,24 @@ private:
         return alphabet;
     }
 
-    static bool is_valid_character(char ch)
+    /// \brief  Determaine if a character is a valid part of the Base 16 alphabet.
+    /// \param ch   The character to check.
+    /// \return \c true if ch is a valid alphabet character, \c false otherwise.
+    [[nodiscard]] static bool is_valid_character(char ch)
     {
         return (   ((ch >= '0') && (ch <= '9'))
                 || ((ch >= 'A') && (ch <= 'F')));
     }
 
+    /// \brief  Perform the encoding.
+    /// \param in_func  A function object called by the encoder to get an input byte.
+    /// \param out_func A function object called by the encoder to output an encoded character.
+    /// \param wrapat   The position in a line at which to wrap the output. Set to zero (0) to
+    ///                 not wrap lines.
+    /// \return \c true if the encoding was successful, false otherwise.
     bool do_encode(std::function<bool(uint8_t &)> in_func,
-                   std::function<bool(char)> out_func, size_t wrapat) const
+                   std::function<bool(char)> out_func,
+                   size_t wrapat) const
     {
         const char *alphabet{this->alphabet()};
         uint8_t     byte;
@@ -87,7 +103,11 @@ private:
         return true;
     }
 
-    static int get_index(char ch)
+    /// \brief  Get the index of a character within the alphabet.
+    /// \param ch   The character whose index is to be retrieved.
+    /// \return The index of ch within the alphabet, or -1 if ch
+    ///         is not in the alphabet.
+    [[nodiscard]] static int get_index(char ch) noexcept
     {
         const char *a{alphabet()};
         for (int i=0; i < 16; ++i)
@@ -96,6 +116,20 @@ private:
         return -1;
     }
 
+    /// @brief  Perform the decoding operation.
+    /// @param in_func          A function object called by the decoder to get an
+    ///                         encoded input character.
+    /// @param out_func         A function object called by the decoder to output
+    ///                         a decoded byte.
+    /// @param handle_newline   \c true if the decoding operation should handle new-line
+    ///                         characters in the encoded input. If \c false, new-line
+    ///                         characters are treated as invalid data.
+    /// @return An \c std::variant object containing either a \c bool or a brace::BasicParseError
+    ///         object. If a decoding error occurs, the variant will contain a brace::BasicParseError
+    ///         object indicating the error. Otherwise the function will return \c true on success
+    ///         or \c false on error. A return value of \c false indicates that the out_func function
+    ///         object failed.
+    [[nodiscard]]
     std::variant<bool, brace::BasicParseError>
     do_decode(std::function<bool(char &)> in_func, std::function<bool(uint8_t)> out_func, bool handle_newline) const
     {
@@ -254,10 +288,8 @@ public:
     /// \param handle_newline   If \c true, newline characters are effectively
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
-    /// \return On success returns a std::vector of uint8_t objects containing
-    /// the decoded bytes.
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \return On success returns a std::vector<uint8_t> containing the decoded bytes.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     std::vector<uint8_t> decode(std::string_view str, bool handle_newline = false) const
     {
         std::vector<uint8_t>    rv;
@@ -296,8 +328,7 @@ public:
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
     /// \return The number of bytes written to the output stream
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -337,8 +368,7 @@ public:
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
     /// \return The number of bytes written to the output stream
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -370,9 +400,8 @@ public:
     /// \param handle_newline   If \c true, newline characters are effectively
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
-    /// \return A \c std::vector<uint8_t> containing the decoded data.
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \return A std::vector<uint8_t> containing the decoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     std::vector<uint8_t>
     decode(std::istream &instream, bool handle_newline = false) const
     {

@@ -31,12 +31,14 @@
 
 namespace brace {
 
-/// \brief  The Base64 is a base class for the Base64 and Base64Url encoding
+/// \brief  The class Base64Base is an abstract base class for the Base64 and Base64Url encoding
 ///         and decoding classes.
 class Base64Base
 {
 protected:
+    /// \brief  Padding character.
     constexpr static char           pad_char{'='};
+    /// \brief  Text of bad-character error message.
     constexpr static const char    *bad_char_msg{"Invalid character"};
 
     /// \brief  Default construct a Base64Base object. This constructor
@@ -44,14 +46,21 @@ protected:
     Base64Base()
     {}
 
-    virtual const char *alphabet() const = 0;
-    virtual const uint8_t *decode_table() const = 0;
+    /// \brief  Return a pointer to the alphabet. Override this function in derived
+    ///         classes to provide an alphabet for the specific encoding/decoding algorithms.
+    /// \return A pointer to the alphabet to be used for encoding.
+    [[nodiscard]] virtual const char *alphabet() const = 0;
+
+    /// \brief  Return a pointer to the decoding table. Override this function in
+    ///         derived classes to provide a decoding table for the specific decoding algorithm.
+    /// \return A pointer to the decoding table to be used for decoding encoded data.
+    [[nodiscard]] virtual const uint8_t *decode_table() const = 0;
 
 private:
     /// \brief  Determine if ch is a valid Base64-encoded character.
     /// \param ch       The character to be checked.
     /// \return \c true if the character is valid, \c false otherwise.
-    bool is_valid_character(char ch) const
+    [[nodiscard]] bool is_valid_character(char ch) const
     {
         if (   ((ch >= 'A') && (ch <= 'Z'))
             || ((ch >= 'a') && (ch <= 'z'))
@@ -69,7 +78,7 @@ private:
     /// \param c    Third of the four characters.
     /// \param d    Fourth of the four characters.
     /// \return std::array of three uint8_t objects containing the decoded bytes.
-    std::array<uint8_t, 3> decode_quad(char a, char b, char c, char d) const
+    [[nodiscard]] std::array<uint8_t, 3> decode_quad(char a, char b, char c, char d) const
     {
         const auto      table{decode_table()};
         const uint32_t  hold{
@@ -84,11 +93,11 @@ private:
 
         return {byte1, byte2, byte3};
     }
-    std::array<uint8_t, 3> decode_quad(std::string_view str) const
+    [[nodiscard]] std::array<uint8_t, 3> decode_quad(std::string_view str) const
     {
         return decode_quad(str[0], str[1], str[2], str[3]);
     }
-    std::array<uint8_t, 3> decode_quad(std::array<char, 4> &arr) const
+    [[nodiscard]] std::array<uint8_t, 3> decode_quad(std::array<char, 4> &arr) const
     {
         return decode_quad(arr[0], arr[1], arr[2], arr[3]);
     }
@@ -104,7 +113,9 @@ protected:
     ///             functions in the public interface call this function, providing
     ///             custom functions (in the form of lamba expressions), passing them
     ///             as the \c in_func and \c out_func parameters.
-    bool do_encode(std::function<bool(uint8_t &)> in_func, std::function<bool(char)> out_func, size_t wrapat) const
+    bool do_encode(std::function<bool(uint8_t &)> in_func,
+                   std::function<bool(char)> out_func,
+                   size_t wrapat) const
     {
         const char             *alphabet{this->alphabet()};
         uint8_t                 byte;
@@ -185,6 +196,7 @@ protected:
     ///             functions in the public interface call this function, providing
     ///             custom functions (in the form of lambda expressions), passing them
     ///             as the \c in_func and \c out_func parameters.
+    [[nodiscard]]
     std::variant<bool, brace::BasicParseError>
     do_decode(std::function<bool(char &)> in_func, std::function<bool(uint8_t)> out_func, bool handle_newline) const
     {
@@ -268,7 +280,7 @@ public:
     /// \param wrapat   Position at which to wrap lines. If zero, no line wrapping occurs.
     /// \return A string containing the Base64 encoded data.
     template<typename input_iterator>
-    auto encode(input_iterator beg, input_iterator end, size_t wrapat = 0) const
+    [[nodiscard]] auto encode(input_iterator beg, input_iterator end, size_t wrapat = 0) const
             -> std::enable_if_t<sizeof(*beg) == 1, std::string>
     {
         const auto  in_size{end - beg};
@@ -298,7 +310,7 @@ public:
     /// \param instream brace::BinIStream containing the data to be encoded.
     /// \param wrapat   Position at which to wrap lines. If zero, no line wrapping occurs.
     /// \return A string containing the encoded data.
-    std::string encode(brace::BinIStream &instream, size_t wrapat = 0) const
+    [[nodiscard]] std::string encode(brace::BinIStream &instream, size_t wrapat = 0) const
     {
         std::string rv;
 
@@ -324,7 +336,7 @@ public:
     /// \param wrapat   Position at which to wrap lines. If zero, no line wrapping occurs.
     /// \return The number of characters written to outstream.
     template<typename input_iterator>
-    auto encode(input_iterator beg, input_iterator end, std::ostream &outstream, size_t wrapat = 0) const
+    [[nodiscard]] auto encode(input_iterator beg, input_iterator end, std::ostream &outstream, size_t wrapat = 0) const
             -> std::enable_if_t<sizeof(*beg) == 1, size_t>
     {
         auto    in_func = [&beg, &end, wrapat](uint8_t &b)
@@ -380,8 +392,7 @@ public:
     ///                         newline characters are considered to be invalid.
     /// \return On success returns a std::vector of uint8_t objects containing
     /// the decoded bytes.
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     std::vector<uint8_t> decode(const std::string_view str, bool handle_newline = false) const
     {
         std::vector<uint8_t>    rv;
@@ -420,8 +431,7 @@ public:
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
     /// \return The number of bytes written to the output stream
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -461,8 +471,7 @@ public:
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
     /// \return The number of bytes written to the output stream
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     /// \details    If there are errors in the input string the function throws.
     ///             If there are errors when writing to the output stream the function
     ///             returns prematurely with the number of bytes successfully written.
@@ -494,9 +503,8 @@ public:
     /// \param handle_newline   If \c true, newline characters are effectively
     ///                         ignored in the input data. If \c false,
     ///                         newline characters are considered to be invalid.
-    /// \return A \c std::vector<uint8_t> containing the decoded data.
-    /// \exception  \c brace::BasicParseError is thrown if errors are encountered
-    ///             in the encoded data.
+    /// \return A std::vector<uint8_t> containing the decoded data.
+    /// \exception  brace::BasicParseError if errors are encountered in the encoded data.
     std::vector<uint8_t>
     decode(std::istream &instream, bool handle_newline = false) const
     {
@@ -521,11 +529,11 @@ public:
 
 
 /// \brief  The Base64 class provides functions for encoding and decoding data
-///         to and from Base64, as described in RFC 4648
-///         (https://www.rfc-editor.org/rfc/rfc4648), section 4.
+///         to and from Base64, as described in RFC 4648, section 4
+///         (https://www.rfc-editor.org/rfc/rfc4648#section-4).
 ///
 /// \details    The only difference between Base64 and Base64Url is the alphabet used
-///             for encoding. Base64Url uses a "URL and Filename safe" alphabet.
+///             for encoding.
 class Base64 : public Base64Base
 {
 private:
@@ -563,15 +571,14 @@ private:
 };
 
 /// \brief  The Base64Url class provides functions for encoding and decoding data
-///         to and from Base64, as described in RFC 4648
-///         (https://www.rfc-editor.org/rfc/rfc4648), section 5.
+///         to and from Base64, as described in RFC 4648, section 5
+///         (https://www.rfc-editor.org/rfc/rfc4648#section-5).
 ///
 /// \details    The only difference between Base64 and Base64Url is the alphabet used
 ///             for encoding. Base64Url uses a "URL and Filename safe" alphabet.
 class Base64Url : public Base64Base
 {
 private:
-
     /// \brief  Return a pointer to the "URL and Filename safe" alphabet used for encoding to Base64Url
     /// \return A pointer to the alphabet.
     const char *alphabet() const override

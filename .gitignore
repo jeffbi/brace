@@ -114,3 +114,8 @@ ipch/
 # Doxygen-generated documentation
 #
 doc/
+
+#
+# Technical docs, generally not added to source control.
+#
+docs/

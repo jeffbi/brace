@@ -19,8 +19,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace brace
-{
+namespace brace {
 
 /// \brief      Create a mode string for the std::fopen function from std::ios_base::openmode bits.
 /// \param mode A combination of std::ios_base::openmode bits specifying the mode with which to open a file.
@@ -241,7 +240,7 @@ public:
 
         return false;
     }
-#endif  // _Win32
+#endif  // _WIN32
 
     /// \brief  Open a file with the specified name, using the specified open mode.
     /// \param filename A pointer to a C-style string containing the name of the file to be opened.
@@ -302,7 +301,7 @@ public:
         return std::fflush(_file);
     }
 
-#if !defined(_MSC_VER)
+#if !defined(_WIN32)
     /// \brief Sets the internal buffer to use for I/O operations performed on the C stream.
     /// \param buffer   A pointer to the buffer for the stream to use.
     void setbuf(char *buffer)

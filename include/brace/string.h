@@ -68,42 +68,6 @@ S to_lower(const S &str)
     return rv;
 }
 
-#if 0
-/// \brief  Perform a case-insensitive compare of two strings.
-/// \tparam S   string type
-/// \param str1 the first string to compare
-/// \param str2 the second string to compare
-/// \return an integer value indicating equality (0),
-///         str1 is < str2 (< 0), or str1 is > str2 (> 0)
-template <typename S>
-inline int ic_compare(const S &str1, const S &str2)
-{
-    auto    it1{str1.cbegin()};
-    auto    end1{str1.cend()};
-    auto    it2{str2.cbegin()};
-    auto    end2{str2.cend()};
-
-    while (it1 != end1 && it2 != end2)
-    {
-        auto    c1{static_cast<typename S::value_type>(Ascii::to_lower(*it1))};
-        auto    c2{static_cast<typename S::value_type>(Ascii::to_lower(*it2))};
-
-        if (c1 < c2)
-            return -1;
-        else if (c1 > c2)
-            return 1;
-
-        ++it1;
-        ++it2;
-    }
-
-    if (it1 == end1)
-        return it2 == end2 ? 0 : -1;
-    else
-        return 1;
-}
-#endif
-
 /// \brief  Compare two string_view objects without regard to case.
 /// \tparam CharT   Character type for string_view
 /// \tparam Traits  Traits for string_view
